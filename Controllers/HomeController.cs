@@ -2,7 +2,6 @@
 using CimpleChat.Services;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
-using TPChat.Services;
 
 namespace TPChat.Controllers
 {

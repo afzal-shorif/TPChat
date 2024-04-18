@@ -1,5 +1,4 @@
 using CimpleChat.Services;
-using TPChat.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
