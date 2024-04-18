@@ -1,0 +1,64 @@
+﻿.theme-header-background {
+    background-color: #7B88B8;
+    color: #FFF;
+}
+
+.theme-text-color {
+    color: #7B88B8;
+}
+
+.theme-body-background {
+    background: #E5E5E5;
+}
+
+.theme-content-background {
+    background: #FFF;
+}
+
+#searchField {
+    border-radius: 10px !important;
+}
+
+.round-img-container {
+    overflow: hidden;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #FFF;
+    color: #7B88B8;
+    text-align: center;
+    padding-top: 5px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.round-img-container img {
+    width: 38px;
+}
+
+
+
+/*=================*/
+
+html, body {
+    height: 100%;
+}
+
+.footer-container {
+    height: 50px;
+}
+
+.msg-user {
+    background: rgb(83, 137, 238);
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    text-align: center;
+    padding-top: 3px;
+}
+
+.msg-txt {
+    background: #FFF;
+    border-radius: 8px;
+    padding: 5px 10px;
+}
