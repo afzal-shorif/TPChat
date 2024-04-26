@@ -29,13 +29,15 @@
         <div class="list-group">
             @foreach (var channel in ViewBag.Channels)
             {
-                <a href="#" class="list-group-item list-group-item-action chat-channel" data-channel="@(channel.Key)">@(channel.Value)</a>
+                <a href="#" class="list-group-item list-group-item-action chat-channel" data-channel="@(channel.Id)">@(channel.Name)</a>
             }
         </div>
     </div>
 </div>
 @section Scripts{
 <script>
+    let userId = '@ViewBag.UserId';
+    let channelId = '@ViewBag.ChannelId'
     let Urls = {
         registration: '@Url.Action("Index", "Registration")',
         channel: '@Url.Action("Index", "Channel")',

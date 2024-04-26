@@ -5,6 +5,8 @@ VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CimpleChat", "CimpleChat.csproj", "{52F4D627-F3F4-4B4E-858F-A3932E08B6D4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CimpleChat.Test", "..\CimpleChat.Test\CimpleChat.Test.csproj", "{976EC77B-9EA8-40B2-9750-8EB4B1E68AE6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{52F4D627-F3F4-4B4E-858F-A3932E08B6D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{52F4D627-F3F4-4B4E-858F-A3932E08B6D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{52F4D627-F3F4-4B4E-858F-A3932E08B6D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{976EC77B-9EA8-40B2-9750-8EB4B1E68AE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{976EC77B-9EA8-40B2-9750-8EB4B1E68AE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{976EC77B-9EA8-40B2-9750-8EB4B1E68AE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{976EC77B-9EA8-40B2-9750-8EB4B1E68AE6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -9,11 +9,10 @@
 
     public class Message
     {
-        public int Id { get; set; }
-        public int From { get; set; }
-        public int To { get; set; }
+        public long Id { get; set; }
+        public long From { get; set; }
         public string Content { get; set; }
-        public MessageStatus Satus { get; set; }
+        public MessageStatus Status { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 }

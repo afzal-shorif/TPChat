@@ -6,5 +6,6 @@ namespace CimpleChat.Services
     {
         public User AddNewUser(string userName);
         public IList<User> GetUsers();
+        public User GetUser(long userId);
     }
 }

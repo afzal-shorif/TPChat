@@ -1,72 +1,111 @@
 ﻿using CimpleChat.Models;
 using System.Linq;
+using System.Net.WebSockets;
+using System.Text.Json.Serialization;
 
 namespace CimpleChat.Services
 {
-    public class GroupMessageService: IGroupMessageService
+    public class GroupMessageService : IGroupMessageService
     {
-        private List<Channel> Channels;
+        private Dictionary<int, Channel>Channels;
+        private Dictionary<int, List<WebSocket>>ActiveConnections;
         private readonly IUserService _userService;
-        
-        public GroupMessageService(IUserService userService)
-        {
-            Channels = new List<Channel>();
+        private readonly IConfiguration _configuration;
+        private readonly IGetNextId _getNextId;
 
-            var c = new Channel()
+        public GroupMessageService(IUserService userService, IConfiguration configuration, IGetNextId getNextId)
+        {
+            Channels = new Dictionary<int, Channel>();
+            ActiveConnections = new Dictionary<int, List<WebSocket>>();
+
+            int channelId = getNextId.GetChannelId();
+            var ch = new Channel()
             {
-                ChannelId = 1,
+                ChannelId = channelId,
                 Name = "Test",
                 Messages = new List<Message>(),
                 Users = new List<int>(),
                 CreatedAt = DateTime.Now.AddDays(-1),
                 Type = ChannelType.@public
             };
-            Channels.Add(c);
+
+            Channels[channelId] = ch;
+
             _userService = userService;
+            _configuration = configuration;
+            _getNextId = getNextId;
         }
 
-        public void AddNewChannel(Channel channel)
+        #region Channel
+
+        public void AddNewChannel(string name, ChannelType type)
         {
-            if(Channels.Count < 100)
+            if (Channels.Count < 100)
             {
-                Channels.Add(channel);
-            }
-            else
-            {
-                throw new Exception("The channel has exit the limit.");
+                Channel ch = new Channel()
+                {
+                    ChannelId = _getNextId.GetChannelId(),
+                    Name = name,
+                    Messages = new List<Message>(),
+                    Users = new List<int>(),
+                    CreatedAt = DateTime.Now,
+                    Type = type
+                };
+                
+                Channels.Add(ch.ChannelId, ch);
             }
         }
 
-
-        public IDictionary<int, string> GetChannelList()
+        public IList<ChannelInfo> GetChannelList()
         {
-            var result = Channels.Select(c => new { ChannelId = c.ChannelId, ChannelName = c.Name }).OrderBy(c => c.ChannelName);
+            var result = Channels.Select(ch =>
+                new ChannelInfo()
+                {
+                    Id = ch.Value.ChannelId,
+                    Name = ch.Value.Name,
+                    NumberOfMessage = ch.Value.Messages.Count,
+                    NumberOfUser = ch.Value.Users.Count,
+                    CreatedAt = ch.Value.CreatedAt,
+                    Type = ch.Value.Type
+                }).OrderBy(ch => ch.Name);
 
-            return result.ToDictionary(c => c.ChannelId, r => r.ChannelName);
+            return result.ToList();
         }
+
+        public int GetTotalChannel()
+        {
+            return Channels.Count;
+        }
+
+        #endregion
 
         public IList<Message> GetMessages(int channelId)
         {
-            var result = Channels.Where(c => c.ChannelId == channelId).Single().Messages.OrderBy(m => m.Id);
+            var result = Channels[channelId].Messages.OrderByDescending(m => m.Id).Take(10);
 
             return result.ToList() ?? new List<Message>();
         }
 
-        public void  AddUserToChannel(int channelId, int userId)
+        #region User
+
+        public void AddUserToChannel(int channelId, int userId)
         {
             try
             {
-                if(GetTotalUser(channelId) < 100)
+                if (GetTotalUser(channelId) < 100)
                 {
-                    Channels.Where(c => c.ChannelId == channelId).Single().Users.Add(userId);
+                    if (!Channels[channelId].Users.Contains(channelId))
+                    {
+                        Channels[channelId].Users.Add(userId);
+                    }
                 }
                 else
                 {
                     throw new Exception("User number has exit the limit.");
                 }
-                
+
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw;
             }
@@ -76,11 +115,9 @@ namespace CimpleChat.Services
         {
             try
             {
-                //var result = Channels.Where(c => c.ChannelId == channelId).Single().Users.OrderBy(u => u.Name);
-                //var result = Channels.Join(_userService.GetUsers(), channel => channel.Users, user => user, (channel, user) => user).Where(c => c.ChannelId == channelId).Single();
-                var result = Channels.Where(c => c.ChannelId == channelId).Single().Users.ToList();
+                var result = Channels[channelId].Users;
 
-                var userList = _userService.GetUsers().Join(result, user => user.Id, userId => userId, (user, userId) =>  user);
+                var userList = _userService.GetUsers().Join(result, user => user.Id, userId => userId, (user, userId) => user);
 
                 return userList.ToList() ?? new List<User>();
             }
@@ -90,16 +127,11 @@ namespace CimpleChat.Services
             }
         }
 
-        public int GetTotalChannel()
-        {
-            return Channels.Count;
-        }
-
         public int GetTotalUser(int channelId)
         {
             try
             {
-                var result = Channels.Where(c => c.ChannelId == channelId).Single().Users.Count;
+                int result = Channels[channelId].Users.Count;
 
                 return result;
             }
@@ -108,5 +140,75 @@ namespace CimpleChat.Services
                 return 0;
             }
         }
+
+        #endregion
+
+        #region Web Socket
+
+        public void AddNewConnection(int channelId, WebSocket ws)
+        {
+            if (!ActiveConnections.ContainsKey(channelId))
+            {
+                ActiveConnections.Add(channelId, new List<WebSocket>());
+            }
+
+            ActiveConnections[channelId].Add(ws);
+        }
+
+        public IList<WebSocket> GetConnections(int channelId)
+        {
+            return ActiveConnections[channelId];
+        }
+
+        public async Task<MessageResponse> AddNewMessage(int channelId, int userId, string msgString)
+        {
+            var user = _userService.GetUser(userId);
+
+            var msgObj = new Message()
+            {
+                Id = _getNextId.GetMessageId(),
+                From = userId,
+                Content = msgString,
+                Status = MessageStatus.Saved,
+                CreatedAt = DateTime.Now,
+            };
+
+            Channels[channelId].Messages.Add(msgObj);
+
+            var msgResponse = new MessageResponse()
+            {
+                Message = msgObj,
+                User = user
+            };
+
+            return msgResponse;
+        }
+
+        public async Task<MessageResponse> AddNewAnnounceMessage(int channelId, int userId)
+        {
+            var user = _userService.GetUser(userId);
+
+            var msgObj = new Message()
+            {
+                Id = _getNextId.GetMessageId(),
+                From = userId,
+                Content = $"{user.Name} has joined.",
+                Status = MessageStatus.Saved,
+                CreatedAt = DateTime.Now,
+            };
+
+            Channels[channelId].Messages.Add(msgObj);
+
+            var msgResponse = new MessageResponse()
+            {
+                Type = "Announce",
+                Message = msgObj,
+                User = user
+            };
+
+            return msgResponse;
+        }
+
+        #endregion
     }
 }
