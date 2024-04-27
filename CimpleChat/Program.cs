@@ -1,6 +1,4 @@
 using CimpleChat.Services;
-using System.Net;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
