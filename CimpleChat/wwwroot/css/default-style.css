@@ -36,8 +36,6 @@
     width: 38px;
 }
 
-
-
 /*=================*/
 
 html, body {
@@ -61,4 +59,8 @@ html, body {
     background: #FFF;
     border-radius: 8px;
     padding: 5px 10px;
+}
+
+.announce-txt {
+    font-size: 12px;
 }

@@ -1,8 +1,8 @@
 ﻿@{
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<div class="row h-100">
-    <div class="col theme-content-background py-3">
+<div class="row h-100 mt-3">
+    <div class="col theme-content-background py-3 rounded">
         <div class="row h-100">
             <div class="col-2 p-0 border-right">
                 <p class="px-3 py-2 m-0" style="font-size: 18px; font-weight: normal; font-style: italic;">Peoples</p>
@@ -30,32 +30,32 @@
             <div class="col-10">
                 <div class="row" id="msgWindow">
                     <div class="col h-100" style="background-color: #eee;">
-                        <div style="position: relative; width: 100%; height: 100%;">
-                            <div class="" style="position:absolute; bottom: 5px; width: 100%;" id="msgContainer">
-                                @* <div class="msgRow d-flex flex-row justify-content-start w-100">
-                                    <div class="msg-user mx-2">M</div>
-                                    <div class="msg-txt">
-                                        Hello How are you?
-                                    </div>
-                                </div> *@
-                                <div class="msgRow d-flex flex-row justify-content-end w-100 mt-2">
-                                    <div class="msg-txt">
-                                        Hello How are you?
-                                    </div>
-                                    <div class="msg-user mx-2">M</div>
-                                </div>
+                        <div style="position: relative; width: 100%; height: 100%; overflow: hidden;">
+                            <div class="" style="position:absolute; bottom: 5px; width: 100%; overflow-y: scroll; scrollbar-width: thin; max-height:100%;" id="msgContainer">
+
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col" id="footerWrapper">
-                        <div class="d-flex flex-row align-items-center justify-content-between" style="gap: 10px;">
+                        <div class="d-flex flex-row align-items-center justify-content-between mt-3" style="gap: 10px;">
                             <input type="text" class="form-control" name="message" id="msgContent">
-                            <button class="btn btn-primary btn-sm" id="btnSendMsg">Send</button>
+                            <button class="btn btn-primary btn-sm round" id="btnSendMsg"><i class="fa-solid fa-paper-plane"></i></button>
                         </div>
+                    </div>                   
+                </div>
+                <!--
+                <div class="row">
+                    <div class="col">
+                        <button class="btn btn-sm"><i class="fa-solid fa-image"></i></button>
+                        <button class="btn btn-sm"><i class="fa-solid fa-paperclip"></i></button>
+                        <button class="btn btn-sm"><i class="fa-solid fa-microphone-lines"></i></button>
+                        <button class="btn btn-sm"><i class="fa-solid fa-link"></i></button>
+                        <button class="btn btn-sm"><i class="fa-solid fa-face-smile"></i></button>
                     </div>
                 </div>
+                -->
             </div>
         </div>
     </div>
@@ -64,20 +64,21 @@
 @section Scripts{
 <script>
     let userId = '@ViewBag.UserId';
-    let channelId = '@ViewBag.ChannelId';
+
     $(document).ready(function () {
-        let navHeight = $('nav').first().outerHeight(true);
-        $('#bodyWrapper').height(window.innerHeight - navHeight + 'px');
 
-        let footerHeight = $('#footerWrapper').outerHeight(true);
-        let msgWindow = $('#msgWindow');
-        msgWindow.height(msgWindow.parent().height() - footerHeight);
+        CimpleChat.Channel.initChannel('#userList', '#msgContainer');      
 
-        //userListSocket();
-        WebSocketModule.init();
+        $('#btnSendMsg').on('click', function () {            
+            CimpleChat.Channel.sendMessage($('#msgContent').val(), function () {
+                $('#msgContent').val('');
+            });
+        });
 
-        $('#btnSendMsg').on('click', function () {
-            WebSocketModule.send($('#msgContent').val());
+        $('#msgContent').on('keydown', function (event) {
+            if (event.key === "Enter"){
+                $('#btnSendMsg').trigger('click');
+            }
         });
     });
 </script>

@@ -10,7 +10,8 @@ namespace CimpleChat.Test
         {
             IGetNextId nextId = Helper.GetRequiredService<IGetNextId>();
             int id = nextId.GetUserId();
-            Assert.False(id <= 0);
+            Assert.True(id > 0);
+            Assert.IsType<int>(id);
         }
 
         [Fact]
@@ -18,7 +19,8 @@ namespace CimpleChat.Test
         {
             IGetNextId nextId = Helper.GetRequiredService<IGetNextId>();
             int id = nextId.GetChannelId();
-            Assert.False(id <= 0);
+            Assert.True(id > 0);
+            Assert.IsType<int>(id);
         }
 
         [Fact]
@@ -27,6 +29,7 @@ namespace CimpleChat.Test
             IGetNextId nextId = Helper.GetRequiredService<IGetNextId>();
             int id = nextId.GetMessageId();
             Assert.False(id <= 0);
+            Assert.IsType<int>(id);
         }
 
         [Fact]

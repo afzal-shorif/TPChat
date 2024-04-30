@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CimpleChat\CimpleChat.csproj" />
     <ProjectReference Include="..\TPChat\CimpleChat.csproj" />
   </ItemGroup>
 
