@@ -31,7 +31,7 @@
                                 <span class="col-sm-2 col-form-label"><i class="fa-solid fa-venus-mars"></i></span>
                                 <div class="col-sm-10 pt-1">
                                     <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="inputGender" id="inputGenderMale" value="male">
+                                        <input class="form-check-input" type="radio" name="inputGender" id="inputGenderMale" value="male" checked>
                                         <label class="form-check-label" for="inputGenderMale">Male</label>
                                     </div>
                                     <div class="form-check form-check-inline">
@@ -146,6 +146,7 @@
 <script>
     let Urls = {
         registration: '@Url.Action("Index", "Registration")',
+        validateUniqueUsername: '@Url.Action("IsUserNameAvailable", "Registration")',
         channel: '@Url.Action("Index", "Channel")',
     }
 

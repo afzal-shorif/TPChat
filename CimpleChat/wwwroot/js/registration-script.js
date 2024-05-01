@@ -8,23 +8,23 @@
         registrationModel = new bootstrap.Modal(containerId);
 
         if (!isCookieAvailable('userInfo')) {
-            // show registration modal and attach submit button click event
+            // show registration modal and attach event to the registration modal component (submit button, input fields)
             registrationModel.show();
 
-            // add event to the input field
-
             $(document).on('keyup', '#inputUsername', validateUsername);
-            $(document).on('focusout', '#inputUsername', validateUsernameIsAlreadyInUse)
-            $(document).on('change', '#inputGender', validateGender);
-            $(document).on('change', '#inputAge', validateAge);
+            //$(document).on('focusout', '#inputUsername', validateUsernameIsAlreadyInUse);
+            $(document).on('keyup', '#inputAge', validateAge);
 
             $(document).on('click', containerId + " #registerUserBtn", function (e) {
-                if (isUsernameValid &&
-                    isGenderValid &&
-                    isAgeValid &&
-                    !isUsernameAlreadyInUse) {
-                        registerUser();
-                    }           
+                e.preventDefault();
+
+                validateUsername();
+                validateGenger();
+                validateAge();
+
+                if (isUsernameValid && isGenderValid && isAgeValid) {
+                    validateUsernameIsAlreadyInUse();
+                }
             });
         }
     }
@@ -46,20 +46,23 @@
         return flag;
     }
 
-    let registerUser = function (userName) {
+    let registerUser = function () {
+        let data = {
+            UserName: $('#inputUsername').val(),
+            Gender: $($("input[name=inputGender]")[0]).prop('checked') ? 0 : 1,
+            Age: $('#inputAge').val()
+        }
 
         $.ajax({
             url: Urls.registration,
             type: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({ UserName: userName }),
+            data: JSON.stringify(data),
             success: function (response) {
                 if (response.status === 'success') {
                     
                     let cookei = JSON.stringify(response.cookieInfo);
                     document.cookie = "userInfo=" + JSON.parse(cookei) + "; path=/";
-
-                    registrationModel.hide();
                     document.location = document.location;
                 } else {
 
@@ -74,33 +77,70 @@
 
     let validateUsername = function () {
         let username = $('#inputUsername');
-        var regex = /[^A-Za-z0-9]/;
+        var regex = /^[a-zA-Z]([a-zA-Z0-9]){2,17}$/;
 
-
-        // length
-        if (username.val().length < 3 || username.val().length > 18) {
-            username.addClass('is-invalid');
-            $('#usernameValidationMessage').text('Between 3 to 18 character.');
-        } else if (regex.test(username.val())) {
+        if (!regex.test(username.val())) {
             username.addClass('is-invalid');
             $('#usernameValidationMessage').text("Illegal characters.");
+            isUsernameValid = false;
         } else {
             $('#usernameValidationMessage').text('');
             username.removeClass('is-invalid');
             username.addClass('is-valid');
+            isUsernameValid = true;
         }
     }
 
-    let validateGender = function () {
+    let validateGenger = function() {
+        let radioButtons = $("input[name=inputGender]");
+        $.each(radioButtons, function (index) {
+            if ($(radioButtons[index]).prop("checked")) {
+                isGenderValid = true;
+            }
+            $(radioButtons[index]).removeClass('is-invalid');
+        });
 
+        if (!isGenderValid) {
+            $.each(radioButtons, function (index) {
+                $(radioButtons[index]).addClass('is-invalid');               
+            });
+        }
     }
 
     let validateAge = function(){
+        let ageDom = $('#inputAge');
+        let age = parseInt(ageDom.val());
 
+        if (age > 16 && age < 100) {
+            ageDom.removeClass('is-invalid');
+            ageDom.addClass('is-valid');
+            isAgeValid = true;
+        } else {
+            ageDom.removeClass('is-valid');
+            ageDom.addClass('is-invalid');
+            isAgeValid = false;
+        } 
     }
 
     let validateUsernameIsAlreadyInUse = function () {
+        $.ajax({
+            url: Urls.validateUniqueUsername,
+            type: 'GET',
+            contentType: 'application/json',
+            data: { username: $("#inputUsername").val() },
+            success: function (response) {
 
+                if (response.status === 'success') {
+                    registerUser();
+                } else {
+                    let userInput = $("#inputUsername");
+                    userInput.addClass('is-invalid');
+                    $('#usernameValidationMessage').text("Username is already in used.");
+                }
+            },
+            error: function (response) {
+            }
+        });
     }
 
 	return {

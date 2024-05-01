@@ -1,5 +1,6 @@
 ﻿
 using CimpleChat.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CimpleChat.Test
@@ -10,6 +11,7 @@ namespace CimpleChat.Test
         {
             var services = new ServiceCollection();
             services.AddScoped<IGetNextId,  GetNextId>();
+            services.AddDataProtection();
 
             return services.BuildServiceProvider();
         }

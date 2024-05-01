@@ -32,5 +32,12 @@ namespace CimpleChat.Services
         {
             return Users.Where(u => u.Id == userId).First();
         }
+
+        public bool IsUsernameAvailable(string username)
+        {
+            User user = Users.Where(u => u.Name == username).FirstOrDefault();
+
+            return user == null;
+        }
     }
 }

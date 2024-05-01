@@ -44,7 +44,7 @@
     <script src="~/js/registration-script.js"></script>
     <script>
         window.onbeforeunload = function () {            
-            CimpleChat.WebSocketModule.close(1001, 'User is leaving the page');
+            CimpleChat.WebSocketModule.closeWebSocket(1001, 'User is leaving the page');
         };
     </script>
     @RenderSection("Scripts", required: false)
