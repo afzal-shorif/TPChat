@@ -8,7 +8,9 @@
 
 		adjustMessageContainerHeight();
 
-		//CimpleChat.WebSocketModule.initWebSocket();
+		let url = 'wss://' + window.location.host + '/Chat/?channelId=' + channelId;
+
+		CimpleChat.WebSocketModule.initWebSocket(url);
 	}
 
 	let adjustMessageContainerHeight = function(){
@@ -25,14 +27,14 @@
 
 		$.each(userList, function (index) {
 			userListDom.push('<button type="button" class="list-group-item list-group-item-action" data-id="');
-			userListDom.push(userList[index].id);
+			userListDom.push(userList[index].Id);
 			userListDom.push('">');
-			userListDom.push(userList[index].userName);
+			userListDom.push(userList[index].Name);
 			userListDom.push('</button>');
 		});
 
 		$(userListContainer).html('');
-		$(userListContainer).html(userListContainer.join(''));
+		$(userListContainer).html(userListDom.join(''));
 	}
 
 	let renderMessage = function (data) {
@@ -52,7 +54,7 @@
 
 		let userName = data.User.Name.toString();
 
-		if (true) {
+		if (data.User.Id != userId) {
 			messageDom.push('<div class="msgRow d-flex flex-row justify-content-start w-100 mt-2">');
 			messageDom.push('<div class="msg-user mx-2">');
 			messageDom.push(userName.substring(0, 1).toUpperCase());
@@ -68,7 +70,7 @@
 			messageDom.push(data.Message.Content);
 			messageDom.push('</div>');
 			messageDom.push('<div class="msg-user mx-2">');
-			messageDom.push(data.substring(0, 1).toUpperCase());
+			messageDom.push(userName.substring(0, 1).toUpperCase());
 			messageDom.push('</div>');
 			messageDom.push('</div>');
 		}
@@ -78,7 +80,11 @@
 
 	let renderMultipleMessage = function (data) {
 		$.each(data, function (index) {
-			renderSingleMessage(data[index]);
+			if (typeof data[index].User.Id.toString() === '0') {
+				renderAnnounceMessage(data[index]);
+			} else {
+				renderSingleMessage(data[index]);
+			}
 		});
 	}
 

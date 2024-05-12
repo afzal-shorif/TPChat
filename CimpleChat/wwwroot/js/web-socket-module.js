@@ -17,6 +17,7 @@
 
 	let open = function (event) {
 		// active the text input
+		console.log("Connection Open");
 	}
 
 	let send = function (msg, callBack) {
@@ -33,20 +34,20 @@
 			}
 		}
 
-		if (callback != null) {
+		if (callBack != null) {
 			callBack(socket.readyState);
 		}
 	}
 
 	let receive = function (event) {
 		let response = JSON.parse(event.data);
-
+		console.log(response);
 		switch (response.Type) {
 			case '__PING__': send('__PONG__');
 				break;
-			case 'Message': CimpleChat.Channel.renderMessage(response.data);
+			case 'Message': CimpleChat.Channel.renderMessage(response.Data);
 				break;
-			case 'ActiveChannelUserList': CimpleChat.Channel.renderChannelUserList(response.data);
+			case 'ActiveChannelUsers': CimpleChat.Channel.renderChannelUserList(response.Data);
 				break;
 			case 'ChannelList':
 				break;

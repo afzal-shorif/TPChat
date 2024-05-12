@@ -2,7 +2,7 @@
 
 namespace CimpleChat.Services
 { 
-    // reserve (1 bit) + ticks (15 bit) + server id (8 bit) + sequence no (8 bit)
+    // reserve (1 bit) + ticks (47 bit) + server id (8 bit) + sequence no (8 bit)
     public class GetNextId: IGetNextId
     {
         private readonly DateTime StartPeriod;
@@ -44,6 +44,7 @@ namespace CimpleChat.Services
 
         private int NextId(int sequence)
         {
+            return sequence;
             long ticks = DateTime.Now.Ticks - StartPeriod.Ticks;
             //long id = (ticks * 10) + ServerId;
 
@@ -55,9 +56,9 @@ namespace CimpleChat.Services
 
             // keep first bit 0 as reserve bit
 
-            int last19BitOfTicks = (int) (ticks >> (64 - 19));  // Right shift to extract last 15 bits 
+            int last19BitOfTicks = (int) (ticks >> (64 - 47));  // Right shift to extract last 15 bits 
 
-            int newId = last19BitOfTicks << 4;                  // Left shift 8 bit to append the server id
+            int newId = last19BitOfTicks << 8;                  // Left shift 8 bit to append the server id
             newId |= ServerId;                                  // Append server id
 
             newId = newId << 8;                                 // Left shift 8 bit to append sequence no
