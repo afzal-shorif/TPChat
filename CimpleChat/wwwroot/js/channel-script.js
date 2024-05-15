@@ -135,22 +135,19 @@
 		});
 	}
 
-	let renderChannels = function (response) {
-		//console.log(response);
+	let renderChannels = function (userList) {
 		let userListDom = [];
 		let no = 0;
 		$.each(response, function (i) {
 			userListDom.push('<tr>');
 			userListDom.push('<td>' + (++no) + '</td>');
-			userListDom.push('<td class="channel-name" style="cursor: pointer;" data-channel="' + response[i].id + '">' + response[i].name +'</td>');
-			userListDom.push('<td class="text-end">' + response[i].numberOfUser + '</td>');
+			userListDom.push('<td class="channel-name" style="cursor: pointer;" data-channel="' + userList[i].id + '">' + userList[i].name +'</td>');
+			userListDom.push('<td class="text-end">' + userList[i].numberOfUser + '</td>');
 			userListDom.push('</tr>');
 		});
 
 		$('#tblChannelList tbody').html('');
 		$('#tblChannelList tbody').html(userListDom.join(''));
-
-		console.log(userListDom.join(''));
 	}
 
 	return {
