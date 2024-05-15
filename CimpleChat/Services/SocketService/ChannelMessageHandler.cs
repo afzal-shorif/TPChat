@@ -1,10 +1,11 @@
 ﻿using CimpleChat.Models;
 using CimpleChat.Models.SocketResponse;
+using CimpleChat.Services.ChannelService;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
 
-namespace CimpleChat.Services
+namespace CimpleChat.Services.SocketService
 {
     public class ChannelMessageHandler : WebSocketHandler
     {
@@ -29,7 +30,7 @@ namespace CimpleChat.Services
             // save and send join (announce) message
             var connectionList = _channelService.GetConnections(channelId);
 
-            var announced = await _channelService.AddNewAnnounceMessage(channelId, user.Id);
+            var announced = await _channelService.AddNewAnnounceMessage(channelId, user.Id, "join");
             var announceResponse = new WebSocketResponse<MessageResponse<AnnouncedMessageResponse>>("Message", announced);
 
             await SendMessageAsync(connectionList, JsonSerializer.Serialize(announceResponse));
@@ -42,14 +43,14 @@ namespace CimpleChat.Services
         }
 
         public override async Task OnDisconnectAsync(WebSocket ws, int channelId, User user)
-        {       
+        {
             // remove connection and user from channel
             _channelService.RemoveConnection(channelId, ws);
             _channelService.RemoveUser(channelId, user.Id);
 
             // send leave message
             var connectionList = _channelService.GetConnections(channelId);
-            var announce = await _channelService.AddNewAnnounceMessage(channelId, user.Id);
+            var announce = await _channelService.AddNewAnnounceMessage(channelId, user.Id, "leave");
             var announceResponse = new WebSocketResponse<MessageResponse<AnnouncedMessageResponse>>("Message", announce);
 
             await SendMessageAsync(connectionList, JsonSerializer.Serialize(announceResponse));
@@ -65,12 +66,12 @@ namespace CimpleChat.Services
         {
             byte[] byteArray = new byte[1024];
 
-            while(ws.State == WebSocketState.Open)
+            while (ws.State == WebSocketState.Open)
             {
                 ArraySegment<byte> buffer = new ArraySegment<byte>(byteArray);
                 var response = await ws.ReceiveAsync(buffer, CancellationToken.None);
 
-                if(response.MessageType == WebSocketMessageType.Text)
+                if (response.MessageType == WebSocketMessageType.Text)
                 {
                     string message = Encoding.UTF8.GetString(byteArray, 0, response.Count);
                     var result = await _channelService.AddNewMessage(channelId, user.Id, message);
@@ -79,9 +80,15 @@ namespace CimpleChat.Services
 
                     await SendMessageAsync(_channelService.GetConnections(channelId), JsonSerializer.Serialize(socketResponse));
                 }
+                else if (response.MessageType == WebSocketMessageType.Close)
+                {
+                    await OnDisconnectAsync(ws, channelId, user);
+                }
             }
 
-            await OnDisconnectAsync(ws, channelId, user);
+            if(ws.State == WebSocketState.Closed || ws.State == WebSocketState.Aborted) { 
+                await OnDisconnectAsync(ws, channelId, user);
+            }
         }
     }
 }

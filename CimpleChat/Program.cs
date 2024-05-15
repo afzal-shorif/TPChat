@@ -1,5 +1,8 @@
 using CimpleChat.Infrastructure;
 using CimpleChat.Services;
+using CimpleChat.Services.ChannelService;
+using CimpleChat.Services.UserService;
+using CimpleChat.Services.SocketService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +19,10 @@ builder.Services.AddSingleton<ChannelMessageHandler>();
 var app = builder.Build();
 
 app.UseWebSockets();
-app.Map("/Chat", (_app) => { _app.UseMiddleware<WebSocketManagerMiddleware>(app.Services.GetRequiredService<ChannelMessageHandler>()); });
+app.Map("/Channel/Chat", (_app) => 
+{ 
+    _app.UseMiddleware<WebSocketManagerMiddleware>(app.Services.GetRequiredService<ChannelMessageHandler>()); 
+});
 app.UseRouting();
 app.MapDefaultControllerRoute();
 app.UseStaticFiles();

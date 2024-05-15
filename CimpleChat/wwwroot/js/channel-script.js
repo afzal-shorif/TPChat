@@ -75,7 +75,7 @@
 			messageDom.push('</div>');
 		}
 
-		$(messageContainer).append(messageDom.join(''));
+		renderElementToMessageContainer(messageDom.join(''));
 	}
 
 	let renderMultipleMessage = function (data) {
@@ -96,8 +96,20 @@
 		messageDom.push('<div class="announce-txt">');
 		messageDom.push(data.Content);
 		messageDom.push('</div></div>');
+		
+		renderElementToMessageContainer(messageDom.join(''));
+	}
 
-		$(messageContainer).append(messageDom.join(''));
+	let renderElementToMessageContainer = function(newElement){
+		// Is the scroll position at the bottom append the element and update the scroll position to bottom
+		let container = $(messageContainer);
+		let isScrollAtBottom = container[0].scrollHeight - container.scrollTop() === container.outerHeight();
+
+		container.append(newElement);
+
+		if (isScrollAtBottom) {
+			container.scrollTop(container[0].scrollHeight);
+		}
 	}
 
 	let sendMessage = function (msg, callBack) {
@@ -108,10 +120,45 @@
 		//}
 	}
 
+	let getChannelList = function (callback) {
+		$.ajax({
+			url: Urls.channelList,
+			type: 'GET',
+			contentType: 'application/json',
+			success: function (response) {
+				if (typeof callback !== "undefined") {
+					callback(response);
+				}
+			},
+			error: function (response) {
+			}
+		});
+	}
+
+	let renderChannels = function (response) {
+		//console.log(response);
+		let userListDom = [];
+		let no = 0;
+		$.each(response, function (i) {
+			userListDom.push('<tr>');
+			userListDom.push('<td>' + (++no) + '</td>');
+			userListDom.push('<td class="channel-name" style="cursor: pointer;" data-channel="' + response[i].id + '">' + response[i].name +'</td>');
+			userListDom.push('<td class="text-end">' + response[i].numberOfUser + '</td>');
+			userListDom.push('</tr>');
+		});
+
+		$('#tblChannelList tbody').html('');
+		$('#tblChannelList tbody').html(userListDom.join(''));
+
+		console.log(userListDom.join(''));
+	}
+
 	return {
 		initChannel: init,
 		renderChannelUserList: renderUserList,
 		renderMessage: renderMessage,
-		sendMessage: sendMessage
+		sendMessage: sendMessage,
+		getChannelList: getChannelList,
+		renderChannels: renderChannels
 	}
 })();

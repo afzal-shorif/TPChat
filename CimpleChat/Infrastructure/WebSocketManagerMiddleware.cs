@@ -1,9 +1,8 @@
-﻿
-using CimpleChat.Services;
-using CimpleChat.Models;
+﻿using CimpleChat.Models;
 using Microsoft.AspNetCore.DataProtection;
 using System.Text.Json.Serialization;
 using System.Net;
+using CimpleChat.Services.SocketService;
 
 namespace CimpleChat.Infrastructure
 {

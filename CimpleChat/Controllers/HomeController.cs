@@ -1,5 +1,5 @@
 ﻿using CimpleChat.Models;
-using CimpleChat.Services;
+using CimpleChat.Services.ChannelService;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,7 +18,7 @@ namespace TPChat.Controllers
                               IConfiguration configuration,
                               IGroupMessageService groupMessageService) {
             
-            _context = httpContextAccessor?.HttpContext;
+            _context = httpContextAccessor.HttpContext;
             _protector = protectionProvider.CreateProtector(configuration["CookiePurpose"].ToString());
             _configuration = configuration;
             _channelService = groupMessageService;
@@ -40,6 +40,6 @@ namespace TPChat.Controllers
 
             ViewBag.Channels = _channelService.GetChannelList();
             return View();
-        } 
+        }       
     }
 }

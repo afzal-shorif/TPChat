@@ -1,6 +1,6 @@
 ﻿using CimpleChat.Models;
 
-namespace CimpleChat.Services
+namespace CimpleChat.Services.UserService
 {
     public interface IUserService
     {

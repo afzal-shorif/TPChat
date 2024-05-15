@@ -1,7 +1,6 @@
 ﻿
 using CimpleChat.Controllers;
 using CimpleChat.Models;
-using CimpleChat.Services;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -10,6 +9,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
+using CimpleChat.Test.Infrastructure;
+using CimpleChat.Services.User;
 
 namespace CimpleChat.Test
 {

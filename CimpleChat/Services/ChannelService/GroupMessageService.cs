@@ -1,17 +1,18 @@
 ﻿using CimpleChat.Models;
 using CimpleChat.Models.SocketResponse;
+using CimpleChat.Services.UserService;
 using System.Linq;
 using System.Net.WebSockets;
 using System.Text.Json.Serialization;
 
-namespace CimpleChat.Services
+namespace CimpleChat.Services.ChannelService
 {
     public class GroupMessageService : IGroupMessageService
     {
         #region Fields
 
-        private Dictionary<int, Channel>Channels;
-        private Dictionary<int, List<WebSocket>>ActiveConnections;
+        private Dictionary<int, Channel> Channels;
+        private Dictionary<int, List<WebSocket>> ActiveConnections;
         private readonly IUserService _userService;
         private readonly IConfiguration _configuration;
         private readonly IGetNextId _getNextId;
@@ -60,7 +61,7 @@ namespace CimpleChat.Services
                     CreatedAt = DateTime.Now,
                     Type = type
                 };
-                
+
                 Channels.Add(ch.ChannelId, ch);
             }
         }
@@ -138,7 +139,7 @@ namespace CimpleChat.Services
             {
                 var result = Channels[channelId].Users;
 
-                var userList = _userService.GetUsers().Join(result, user => user.Id, userId => userId, (user, userId) => new ActiveUserResponse() 
+                var userList = _userService.GetUsers().Join(result, user => user.Id, userId => userId, (user, userId) => new ActiveUserResponse()
                 {
                     Id = user.Id,
                     Name = user.Name,
@@ -223,13 +224,13 @@ namespace CimpleChat.Services
                 {
                     Message = msgObj,
                     User = user
-                }  
+                }
             };
 
             return msgResponse;
         }
 
-        public async Task<MessageResponse<AnnouncedMessageResponse>> AddNewAnnounceMessage(int channelId, int userId, string type = "Leave")
+        public async Task<MessageResponse<AnnouncedMessageResponse>> AddNewAnnounceMessage(int channelId, int userId, string type = "leave")
         {
             var user = _userService.GetUser(userId);
 
@@ -237,7 +238,7 @@ namespace CimpleChat.Services
             {
                 Id = _getNextId.GetMessageId(),
                 From = 0,
-                Content = $"{user.Name} has joined.",
+                Content = type == "leave" ? $"{user.Name} has leave." : $"{user.Name} has join.",
                 Status = MessageStatus.Saved,
                 CreatedAt = DateTime.Now,
             };

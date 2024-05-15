@@ -1,5 +1,5 @@
 ﻿using CimpleChat.Models;
-using CimpleChat.Services;
+using CimpleChat.Services.UserService;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.RegularExpressions;

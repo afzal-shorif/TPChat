@@ -15,6 +15,10 @@
 		}
 	}
 
+	let tryToConnect = function () {
+
+	}
+
 	let open = function (event) {
 		// active the text input
 		console.log("Connection Open");

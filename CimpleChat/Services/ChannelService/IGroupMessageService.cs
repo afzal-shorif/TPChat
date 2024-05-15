@@ -2,7 +2,7 @@
 using CimpleChat.Models.SocketResponse;
 using System.Net.WebSockets;
 
-namespace CimpleChat.Services
+namespace CimpleChat.Services.ChannelService
 {
     public interface IGroupMessageService
     {
@@ -18,6 +18,6 @@ namespace CimpleChat.Services
         public void AddNewConnection(int channelId, WebSocket ws);
         public IList<WebSocket> GetConnections(int channelId);
         Task<MessageResponse<SingleMessageResponse>> AddNewMessage(int channelId, int userId, string msgString);
-        Task<MessageResponse<AnnouncedMessageResponse>> AddNewAnnounceMessage(int channelId, int userId);
+        Task<MessageResponse<AnnouncedMessageResponse>> AddNewAnnounceMessage(int channelId, int userId, string type);
     }
 }

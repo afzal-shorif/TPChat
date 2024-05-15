@@ -1,14 +1,14 @@
 ﻿using CimpleChat.Models;
 
-namespace CimpleChat.Services
+namespace CimpleChat.Services.UserService
 {
-    public class UserService: IUserService
+    public class UserService : IUserService
     {
         private readonly IGetNextId _getNextId;
         private List<User> Users { get; set; }
-        
-        public UserService(IGetNextId getNextId) 
-        { 
+
+        public UserService(IGetNextId getNextId)
+        {
             Users = new List<User>();
             _getNextId = getNextId;
         }
@@ -27,7 +27,7 @@ namespace CimpleChat.Services
             return user;
         }
 
-        public IList<User>GetUsers() { return Users; }
+        public IList<User> GetUsers() { return Users; }
         public User GetUser(long userId)
         {
             return Users.Where(u => u.Id == userId).First();

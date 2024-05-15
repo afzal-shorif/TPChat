@@ -1,16 +1,15 @@
-﻿
-using CimpleChat.Services;
+﻿using CimpleChat.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CimpleChat.Test
+namespace CimpleChat.Test.Infrastructure
 {
     public static class Helper
     {
         private static IServiceProvider Provider()
         {
             var services = new ServiceCollection();
-            services.AddScoped<IGetNextId,  GetNextId>();
+            services.AddScoped<IGetNextId, GetNextId>();
             services.AddDataProtection();
 
             return services.BuildServiceProvider();

@@ -1,4 +1,5 @@
 ﻿using CimpleChat.Services;
+using CimpleChat.Test.Infrastructure;
 using Xunit;
 
 namespace CimpleChat.Test

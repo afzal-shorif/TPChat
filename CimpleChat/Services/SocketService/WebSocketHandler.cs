@@ -2,13 +2,13 @@
 using System.Net.WebSockets;
 using System.Text;
 
-namespace CimpleChat.Services
+namespace CimpleChat.Services.SocketService
 {
     public abstract class WebSocketHandler
     {
         public WebSocketHandler()
         {
- 
+
         }
 
         public abstract Task OnConnectAsync(WebSocket ws, int channelId, User user);
@@ -33,7 +33,7 @@ namespace CimpleChat.Services
             }
         }
 
-        public async Task SendMessageAsync(WebSocket ws, int channelId, User user, string message)
+        public async Task SendMessageAsync(WebSocket ws, string message)
         {
             byte[] msgByte = Encoding.UTF8.GetBytes(message);
             ArraySegment<byte> buffer = new ArraySegment<byte>(msgByte);
