@@ -138,7 +138,7 @@
 	let renderChannels = function (userList) {
 		let userListDom = [];
 		let no = 0;
-		$.each(response, function (i) {
+		$.each(userList, function (i) {
 			userListDom.push('<tr>');
 			userListDom.push('<td>' + (++no) + '</td>');
 			userListDom.push('<td class="channel-name" style="cursor: pointer;" data-channel="' + userList[i].id + '">' + userList[i].name +'</td>');
