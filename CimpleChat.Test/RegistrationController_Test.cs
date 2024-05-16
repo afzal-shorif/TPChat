@@ -10,7 +10,7 @@ using Newtonsoft.Json.Linq;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using CimpleChat.Test.Infrastructure;
-using CimpleChat.Services.User;
+using CimpleChat.Services.UserService;
 
 namespace CimpleChat.Test
 {
