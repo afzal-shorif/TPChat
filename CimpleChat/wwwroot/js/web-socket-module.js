@@ -67,11 +67,14 @@
 			return;
 		}
 
-		if (typeof reason === "undefined") {
-			socket.close(code);
-		} else {
-			socket.close(code, reason);
-		}
+		socket.onclose = function () { }
+		socket.close();
+
+		//if (typeof reason === "undefined") {
+		//	socket.close(code);
+		//} else {
+		//	socket.close(code, reason);
+		//}
 	}
 
 	return {

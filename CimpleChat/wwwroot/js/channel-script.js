@@ -8,7 +8,7 @@
 
 		adjustMessageContainerHeight();
 
-		let url = 'wss://' + window.location.host + '/Chat/?channelId=' + channelId;
+		let url = 'wss://' + window.location.host + '/Channel/Chat/?channelId=' + channelId;
 
 		CimpleChat.WebSocketModule.initWebSocket(url);
 	}
@@ -114,10 +114,11 @@
 
 	let sendMessage = function (msg, callBack) {
 		// validate
+		let trimedMessage = msg.trim();
 
-		//if (valid) {
-		CimpleChat.WebSocketModule.sendMessage(msg, callBack);
-		//}
+		if (trimedMessage.length > 0) {
+			CimpleChat.WebSocketModule.sendMessage(msg, callBack);
+		}
 	}
 
 	let getChannelList = function (callback) {
