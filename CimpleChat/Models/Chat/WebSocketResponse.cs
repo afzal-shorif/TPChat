@@ -1,20 +1,14 @@
-﻿namespace CimpleChat.Models.SocketResponse
+﻿namespace CimpleChat.Models.Chat;
+
+public class WebSocketResponse<T>
 {
-    public class WebSocketResponse<T>
+    public string Type { get; set; }
+    public T Data { get; set; }
+
+    public WebSocketResponse(string type, T data)
     {
-        public string Type { get; set; }
-        public T Data { get; set; }
-
-        public WebSocketResponse()
-        {
-
-        }
-
-        public WebSocketResponse(string type, T data)
-        {
-            this.Type = type;
-            this.Data = data;
-        }
+        Type = type;
+        Data = data;
     }
 }
 

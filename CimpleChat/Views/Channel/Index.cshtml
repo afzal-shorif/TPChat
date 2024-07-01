@@ -50,12 +50,16 @@
 
 @section Scripts{
 <script>
-    let userId = '@ViewBag.UserId';
-    let channelId = '@ViewBag.ChannelId';
+    const userId = '@ViewBag.UserId';
+    const channelId = '@ViewBag.ChannelId';
+    const username = '@ViewBag.Username';
+    const updateUserStatus = '@Url.Action("UpdateActiveStatus", "Home")';
 
     $(document).ready(function () {
 
-        CimpleChat.Channel.initChannel('#userList', '#msgContainer');      
+        CimpleChat.Channel.initChannel('#userList', '#msgContainer');
+        
+        CimpleChat.Common.updateUserStatus(updateUserStatus);
 
         $('#btnSendMsg').on('click', function () {            
             CimpleChat.Channel.sendMessage($('#msgContent').val(), function () {
@@ -68,6 +72,17 @@
                 $('#btnSendMsg').trigger('click');
             }
         });
+
+        $('#msgContent').focus(function () {
+            console.log("focus");
+            CimpleChat.Chat.UIRender.updateSeenFlag();        
+        });
+
+        $('#msgContainer').scroll(function () {
+            console.log("scroll");
+            CimpleChat.Chat.UIRender.updateSeenFlag();
+        });
+
     });
 </script>
 }

@@ -21,30 +21,29 @@ namespace CimpleChat.Services
             MessageSequence = 1;
         }
 
-        public int GetUserId()
+        public long GetUserId()
         {
             if (UserSequence >= 255) UserSequence = 0;
             
             return NextId(++UserSequence);
         }
 
-        public int GetChannelId()
+        public long GetChannelId()
         {
             if (ChannelSequence >= 255) ChannelSequence = 0;
 
             return NextId(++ChannelSequence);
         }
 
-        public int GetMessageId()
+        public long GetMessageId()
         {
             if(MessageSequence >= 255) MessageSequence = 0;
 
             return NextId(++MessageSequence);
         }
 
-        private int NextId(int sequence)
+        private long NextId(int sequence)
         {
-            return sequence;
             long ticks = DateTime.Now.Ticks - StartPeriod.Ticks;
             //long id = (ticks * 10) + ServerId;
 
@@ -56,7 +55,7 @@ namespace CimpleChat.Services
 
             // keep first bit 0 as reserve bit
 
-            int last19BitOfTicks = (int) (ticks >> (64 - 47));  // Right shift to extract last 15 bits 
+            int last19BitOfTicks = (int) (ticks >> (64 - 17));  // Right shift to extract last 17 bits 
 
             int newId = last19BitOfTicks << 8;                  // Left shift 8 bit to append the server id
             newId |= ServerId;                                  // Append server id

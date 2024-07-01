@@ -45,6 +45,16 @@ namespace CimpleChat.Test
             userList.Add(username);
             return true;
         }
+
+        public void RemoveInactiveUsers()
+        {
+            throw new Exception("Invalid Test");
+        }
+
+        public void UpdateLastActiveOn(long userId)
+        {
+            throw new Exception("Invalid Test");
+        }
     }
 
     #endregion

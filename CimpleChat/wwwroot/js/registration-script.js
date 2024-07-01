@@ -145,5 +145,6 @@
 
 	return {
         initRegistration: initRegistration,
+        isCookieAvailable: isCookieAvailable
 	}
 })(document);

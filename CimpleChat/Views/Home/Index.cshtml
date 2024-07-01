@@ -144,11 +144,12 @@
 
 @section Scripts{
 <script>
-    let Urls = {
+    const Urls = {
         registration: '@Url.Action("Index", "Registration")',
         validateUniqueUsername: '@Url.Action("IsUserNameAvailable", "Registration")',
         channel: '@Url.Action("Index", "Channel")',
-        channelList: '@Url.Action("GetChannelList", "Channel")'
+        channelList: '@Url.Action("GetChannelList", "Channel")',
+        updateUserStatus: '@Url.Action("UpdateActiveStatus", "Home")'
     }
 
     $(document).ready(function () {
@@ -160,12 +161,14 @@
 
         CimpleChat.UserRegistration.initRegistration('#registrationModal');
 
-            setInterval(
-                function () {
-                    CimpleChat.Channel.getChannelList(CimpleChat.Channel.renderChannels)
-                },
-                15000
-            );    
+        CimpleChat.Common.updateUserStatus(Urls.updateUserStatus);
+        
+        setInterval(
+            function () {
+                CimpleChat.Channel.getChannelList(CimpleChat.Channel.renderChannels)
+            },
+            15000
+        );    
     });
 </script>
 }

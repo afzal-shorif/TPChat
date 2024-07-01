@@ -1,9 +1,8 @@
 ﻿using CimpleChat.Models;
-using CimpleChat.Models.SocketResponse;
+using CimpleChat.Models.Chat;
+using CimpleChat.Models.Channel;
 using CimpleChat.Services.UserService;
-using System.Linq;
 using System.Net.WebSockets;
-using System.Text.Json.Serialization;
 
 namespace CimpleChat.Services.ChannelService
 {
@@ -11,8 +10,8 @@ namespace CimpleChat.Services.ChannelService
     {
         #region Fields
 
-        private Dictionary<int, Channel> Channels;
-        private Dictionary<int, List<WebSocket>> ActiveConnections;
+        private Dictionary<long, ChannelModel> Channels;
+        private Dictionary<long, List<WebSocket>> ActiveConnections;
         private readonly IUserService _userService;
         private readonly IConfiguration _configuration;
         private readonly IGetNextId _getNextId;
@@ -23,16 +22,16 @@ namespace CimpleChat.Services.ChannelService
 
         public GroupMessageService(IUserService userService, IConfiguration configuration, IGetNextId getNextId)
         {
-            Channels = new Dictionary<int, Channel>();
-            ActiveConnections = new Dictionary<int, List<WebSocket>>();
+            Channels = new Dictionary<long, ChannelModel>();
+            ActiveConnections = new Dictionary<long, List<WebSocket>>();
 
-            int channelId = getNextId.GetChannelId();
-            var ch = new Channel()
+            long channelId = getNextId.GetChannelId();
+            var ch = new ChannelModel()
             {
                 ChannelId = channelId,
                 Name = "Test",
                 Messages = new List<Message>(),
-                Users = new List<int>(),
+                Users = new List<long>(),
                 CreatedAt = DateTime.Now.AddDays(-1),
                 Type = ChannelType.@public
             };
@@ -52,12 +51,12 @@ namespace CimpleChat.Services.ChannelService
         {
             if (Channels.Count < 100)
             {
-                Channel ch = new Channel()
+                ChannelModel ch = new ChannelModel()
                 {
                     ChannelId = _getNextId.GetChannelId(),
                     Name = name,
                     Messages = new List<Message>(),
-                    Users = new List<int>(),
+                    Users = new List<long>(),
                     CreatedAt = DateTime.Now,
                     Type = type
                 };
@@ -89,29 +88,47 @@ namespace CimpleChat.Services.ChannelService
 
         #endregion
 
-        public MessageResponse<IList<SingleMessageResponse>> GetMessages(int channelId)
+        public IList<MessageResponse> GetMessages(long channelId)
         {
             var messages = Channels[channelId].Messages.OrderByDescending(m => m.Id).Take(10);
             var users = _userService.GetUsers();
 
-            var result = messages.Join(users, msg => msg.From, user => user.Id, (msg, user) => new SingleMessageResponse()
+            var result = messages.Join(users, msg => msg.From, user => user.Id, (msg, user) => new MessageResponse()
             {
-                Message = msg,
-                User = user
+                MessageId = msg.Id,
+                UserId = user.Id,
+                UserName = user.Name,
+                Content = msg.Content,
+                Status = msg.Status,
+                CreatedAt = msg.CreatedAt,
             }).ToList();
 
-            var response = new MessageResponse<IList<SingleMessageResponse>>()
-            {
-                MessageType = "Multiple",
-                MessageInfo = result
-            };
+            return result;
+        }
 
-            return response;
+        public Message? GetMessage(long channelId, long messageId)
+        {
+            var message = Channels[channelId].Messages.Where(m => m.Id == messageId);
+            if (message.Any())
+            {
+                return message.FirstOrDefault<Message>();
+            }
+
+            return null;
+        }
+
+        public void UpdateMessageStatus(long channelId, long messageId, Models.MessageStatus Status)
+        {
+            var message = Channels[channelId].Messages.Where(m => m.Id == messageId);
+            if (message.Any())
+            {
+                message.FirstOrDefault<Message>().Status = Status;
+            }
         }
 
         #region User
 
-        public void AddUserToChannel(int channelId, int userId)
+        public void AddUserToChannel(long channelId, long userId)
         {
             try
             {
@@ -133,7 +150,7 @@ namespace CimpleChat.Services.ChannelService
             }
         }
 
-        public IList<ActiveUserResponse> GetActiveUsers(int channelId)
+        public IList<ActiveUserResponse> GetActiveUsers(long channelId)
         {
             try
             {
@@ -153,7 +170,7 @@ namespace CimpleChat.Services.ChannelService
             }
         }
 
-        public int GetTotalUser(int channelId)
+        public int GetTotalUser(long channelId)
         {
             try
             {
@@ -167,7 +184,7 @@ namespace CimpleChat.Services.ChannelService
             }
         }
 
-        public void RemoveUser(int channelId, int userId)
+        public void RemoveUser(long channelId, long userId)
         {
             if (Channels.ContainsKey(channelId))
             {
@@ -179,7 +196,7 @@ namespace CimpleChat.Services.ChannelService
 
         #region Web Socket
 
-        public void AddNewConnection(int channelId, WebSocket ws)
+        public void AddNewConnection(long channelId, WebSocket ws)
         {
             if (!ActiveConnections.ContainsKey(channelId))
             {
@@ -189,7 +206,7 @@ namespace CimpleChat.Services.ChannelService
             ActiveConnections[channelId].Add(ws);
         }
 
-        public void RemoveConnection(int channelId, WebSocket ws)
+        public void RemoveConnection(long channelId, WebSocket ws)
         {
             if (ActiveConnections.ContainsKey(channelId))
             {
@@ -197,40 +214,40 @@ namespace CimpleChat.Services.ChannelService
             }
         }
 
-        public IList<WebSocket> GetConnections(int channelId)
+        public IList<WebSocket> GetConnections(long channelId)
         {
             return ActiveConnections[channelId];
         }
 
-        public async Task<MessageResponse<SingleMessageResponse>> AddNewMessage(int channelId, int userId, string msgString)
+        public async Task<MessageResponse> AddNewMessage(MessageRequest messageRequest)
         {
-            var user = _userService.GetUser(userId);
+            var user = _userService.GetUser(messageRequest.UserId);
 
             var msgObj = new Message()
             {
                 Id = _getNextId.GetMessageId(),
-                From = userId,
-                Content = msgString,
-                Status = MessageStatus.Saved,
+                From = messageRequest.UserId,
+                Content = messageRequest.Content,
+                Status = Models.MessageStatus.Saved,
                 CreatedAt = DateTime.Now,
             };
 
-            Channels[channelId].Messages.Add(msgObj);
+            Channels[messageRequest.ChannelId].Messages.Add(msgObj);
 
-            var msgResponse = new MessageResponse<SingleMessageResponse>()
+            var msgResponse = new MessageResponse()
             {
-                MessageType = "Single",
-                MessageInfo = new SingleMessageResponse()
-                {
-                    Message = msgObj,
-                    User = user
-                }
+                MessageId = msgObj.Id,
+                UserId = messageRequest.UserId,
+                UserName = user.Name,
+                Content = msgObj.Content,
+                Status = msgObj.Status,
+                CreatedAt = msgObj.CreatedAt,
             };
-
+            
             return msgResponse;
         }
 
-        public async Task<MessageResponse<AnnouncedMessageResponse>> AddNewAnnounceMessage(int channelId, int userId, string type = "leave")
+        public async Task<MessageResponse> AddNewAnnounceMessage(long channelId, long userId, string type = "leave")
         {
             var user = _userService.GetUser(userId);
 
@@ -239,19 +256,20 @@ namespace CimpleChat.Services.ChannelService
                 Id = _getNextId.GetMessageId(),
                 From = 0,
                 Content = type == "leave" ? $"{user.Name} has leave." : $"{user.Name} has join.",
-                Status = MessageStatus.Saved,
+                Status = Models.MessageStatus.Saved,
                 CreatedAt = DateTime.Now,
             };
 
             Channels[channelId].Messages.Add(msgObj);
 
-            var msgResponse = new MessageResponse<AnnouncedMessageResponse>()
+            var msgResponse = new MessageResponse()
             {
-                MessageType = "Announce",
-                MessageInfo = new AnnouncedMessageResponse()
-                {
-                    Content = msgObj.Content
-                }
+                MessageId = msgObj.Id,
+                UserId = 0,
+                UserName = "System",
+                Content = msgObj.Content,
+                Status = msgObj.Status,
+                CreatedAt = DateTime.Now,                
             };
 
             return msgResponse;

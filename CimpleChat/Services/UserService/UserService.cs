@@ -19,7 +19,8 @@ namespace CimpleChat.Services.UserService
             {
                 Id = _getNextId.GetUserId(),
                 Name = userName,
-                CreatedAt = DateTime.Now,
+                CreatedAt = DateTime.UtcNow,
+                LastActiveOn = DateTime.UtcNow,
             };
 
             Users.Add(user);
@@ -35,9 +36,27 @@ namespace CimpleChat.Services.UserService
 
         public bool IsUsernameAvailable(string username)
         {
-            User user = Users.Where(u => u.Name == username).FirstOrDefault();
+            User? user = Users.Where(u => u.Name == username).FirstOrDefault();
 
             return user == null;
+        }
+
+        public void UpdateLastActiveOn(long userId)
+        {
+            Users.Where(u => u.Id == userId).FirstOrDefault()!.LastActiveOn = DateTime.UtcNow;
+        }
+
+        public void RemoveInactiveUsers()
+        {
+            foreach (var user in Users)
+            {
+                int diff = (user.LastActiveOn - DateTime.UtcNow).Minutes;
+
+                if(diff > 2)
+                {
+                    Users.Remove(user);
+                }
+            }
         }
     }
 }

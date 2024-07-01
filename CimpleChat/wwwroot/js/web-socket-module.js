@@ -1,46 +1,48 @@
 ﻿CimpleChat.WebSocketModule = (function () {
+
 	let socket = null;
+	let connect = null;
 
 	let init = function (url) {
+		
+		connect = tryToConnect(url);
+		connect();
+	}
 
-		try {
+	let tryToConnect = function (url) {
+		// to reconnect, we are using javascript clouser to avoid the url parameter as global (global under this module)
+		// just try to make things more complex by using clouser. We could easily store url parameter in a variable and reuse it
+
+		return function () {
 			socket = new WebSocket(url);
 
 			socket.onopen = open;
 			socket.onmessage = receive;
 			socket.onerror = error;
-			
-		} catch (Exception) {
-			alert("Failed to connect with server. Please reload the page.");
 		}
-	}
-
-	let tryToConnect = function () {
-
 	}
 
 	let open = function (event) {
 		// active the text input
 		console.log("Connection Open");
+
+		// message queue
 	}
 
-	let send = function (msg, callBack) {
+	let send = function (msg) {
 		if (socket == null) {
 			alert('Connection is not established yet. Please wait or reload the page.');
-			return;
+			return false;
 		}
 
 		if(socket.readyState.toString() === "1") {
-			if (typeof (msg) === "string" && msg.length <= 80) {
+			if (socket.bufferedAmount == 0) {
 				socket.send(msg);
-			} else {
-				alert("Invalid input. Currently we allow only text and maximum 80 character.");
+				return true;
 			}
 		}
 
-		if (callBack != null) {
-			callBack(socket.readyState);
-		}
+		return false;
 	}
 
 	let receive = function (event) {
@@ -49,17 +51,23 @@
 		switch (response.Type) {
 			case '__PING__': send('__PONG__');
 				break;
-			case 'Message': CimpleChat.Channel.renderMessage(response.Data);
+			case 'Message':
+			case 'MessageStatus':
+			case 'Announce': CimpleChat.Chat.UIRender.renderMessage(response);
 				break;
 			case 'ActiveChannelUsers': CimpleChat.Channel.renderChannelUserList(response.Data);
-				break;
-			case 'ChannelList':
 				break;
 		}
 	}
 
 	let error = function (event) {
 		// send ajax request to log the error
+
+		// inform Message Queue that disconnect
+		CimpleChat.Chat.MessageQueue.onDisconnect();
+
+		// try to reconnect
+		//connect();
 	}
 
 	let close = function (code, reason) {

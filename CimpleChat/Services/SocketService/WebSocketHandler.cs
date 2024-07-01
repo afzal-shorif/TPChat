@@ -18,7 +18,7 @@ namespace CimpleChat.Services.SocketService
         public abstract Task ReceiveAsync(WebSocket ws, int channelId, User user);
 
 
-        public async Task SendMessageAsync(IList<WebSocket> connections, string message)
+        public async ValueTask SendMessageAsync(IList<WebSocket> connections, string message)
         {
             byte[] msgByte = Encoding.UTF8.GetBytes(message);
             ArraySegment<byte> buffer = new ArraySegment<byte>(msgByte);
@@ -33,7 +33,7 @@ namespace CimpleChat.Services.SocketService
             }
         }
 
-        public async Task SendMessageAsync(WebSocket ws, string message)
+        public async ValueTask SendMessageAsync(WebSocket ws, string message)
         {
             byte[] msgByte = Encoding.UTF8.GetBytes(message);
             ArraySegment<byte> buffer = new ArraySegment<byte>(msgByte);
