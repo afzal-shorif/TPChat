@@ -45,19 +45,12 @@ namespace CimpleChat.Services
         private long NextId(int sequence)
         {
             long ticks = DateTime.Now.Ticks - StartPeriod.Ticks;
-            //long id = (ticks * 10) + ServerId;
-
-            //int numOfDigit = (int) Math.Floor(Math.Log10(sequence)) + 1;
-            //id *= (long)Math.Pow(10, numOfDigit);
-            //id += sequence;
-
-            //return id;
 
             // keep first bit 0 as reserve bit
 
-            int last19BitOfTicks = (int) (ticks >> (64 - 17));  // Right shift to extract last 17 bits 
+            long last47BitOfTicks = (ticks >> (64 - 47));  // Right shift to extract last 17 bits 
 
-            int newId = last19BitOfTicks << 8;                  // Left shift 8 bit to append the server id
+            long newId = last47BitOfTicks << 8;                 // Left shift 8 bit to append the server id
             newId |= ServerId;                                  // Append server id
 
             newId = newId << 8;                                 // Left shift 8 bit to append sequence no
