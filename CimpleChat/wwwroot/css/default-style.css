@@ -64,3 +64,36 @@ html, body {
 .announce-txt {
     font-size: 12px;
 }
+
+.channel-container{
+    margin-bottom: 5px;
+    max-height: 50%;
+}
+
+.channel-header{
+    color: #FFF;
+    background-color: #7B88B8;
+    padding: 5px 5px 5px 10px;
+}
+
+.channel-header i{
+    padding: 5px;
+}
+
+.channel-header i:hover{
+    color: #000;
+    background-color: #FFF;
+    border-radius: 3px;
+}
+
+.channel-list {
+    position: relative;
+    overflow: auto;
+    scrollbar-width: thin;
+}
+
+.left-panel{
+    width: 200px;
+    height: 100%;
+    background: #FFF;
+}

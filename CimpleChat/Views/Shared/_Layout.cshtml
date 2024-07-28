@@ -16,7 +16,10 @@
         <div class="container">
             <div class="d-flex justify-content-between w-100" style="gap: 10px;">
                 <div class="">
-                    <a href="@Url.Action("Index", "Home")" class="text-white"><i class="fa-solid fa-house mt-1" style="font-size: 30px;"></i></a>
+                    <!--
+                         <a href="@Url.Action("Index", "Home")" class="text-white"><i class="fa-solid fa-house mt-1" style="font-size: 30px;"></i></a>
+                    -->
+                    <span style="font-size: 30px;">C</span>imple<span style="font-size: 30px;">C</span>hat
                 </div>
                 <div class="w-50">
                     <input type="text" class="form-control" id="searchField" name="search" placeholder="Search" style="border-color: #7b88b8;" />
@@ -30,7 +33,7 @@
                         <div class="round-img-container">
                             @ViewBag.UserProfileCharacter
                         </div>
-                    }                   
+                    }
                 </div>
             </div>
         </div>
@@ -47,6 +50,7 @@
     <script src="~/js/chat/message-queue-script.js"></script>
     <script src="~/js/channel-script.js"></script>
     <script src="~/js/registration-script.js"></script>
+    <script src="~/js/ui-script.js"></script>
     <script>
         window.onbeforeunload = function () {            
             CimpleChat.WebSocketModule.closeWebSocket(1001, 'User is leaving the page');
