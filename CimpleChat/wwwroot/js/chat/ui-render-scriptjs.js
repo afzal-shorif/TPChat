@@ -35,13 +35,13 @@
 		}
 
 		// for client(current user) message, set the scroll at the bottom
-		if (response.Data.UserId == userId) {
+		if (response.Data.UserId == CimpleChat.Common.getConst('userId')) {
 			opts.from = 'client';
 		}
 
 		renderElementToMessageContainer(messageDomString, opts);
 
-		if (response.Type === "Message" && response.Data.UserId != userId) {
+		if (response.Type === "Message" && response.Data.UserId != CimpleChat.Common.getConst('userId')) {
 			sendMessageSeenResponse(response.Data.MessageId);
 		}
 	}
@@ -63,10 +63,10 @@
 		let messageDom = [],
 			msgId = value.hasOwnProperty('MessageId') ? value.MessageId : value.TempMessageId;
 
-		if (value.UserId.toString() === '0') {
+		if (value.UserId.toString() === "0") {
 			messageDom.push(renderAnnounceMessage(value));
 
-		} else if (value.UserId == userId) {
+		} else if (value.UserId.toString() === CimpleChat.Common.getConst('userId').toString()) {
 			messageDom.push('<div class="msgRow status-' + value.Status + ' d-flex flex-row justify-content-end w-100 mt-2" id="message' + msgId + '" data-uid="' + value.UserId +'">');
 			messageDom.push('<div class="msg-txt">');
 			messageDom.push(value.Content);
@@ -185,7 +185,9 @@
 		init: function (messageContainerDiv) {
 			messageContainer = messageContainerDiv;
 		},
-
+		clear: function () {
+			$(messageContainer).html('');
+		},
 		renderMessage: function (response) {
 			renderMessageToUI(response);
 		},

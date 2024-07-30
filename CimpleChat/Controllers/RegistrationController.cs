@@ -58,6 +58,8 @@ namespace CimpleChat.Controllers
                 {
                     status = "success",
                     message = $"Username \"{userInfo.UserName}\" is available.",
+                    userId = user.Id,
+                    username = user.Name,
                     cookieInfo = _protector.Protect(cookeiInfo),
                 };
                 return Json(resp);

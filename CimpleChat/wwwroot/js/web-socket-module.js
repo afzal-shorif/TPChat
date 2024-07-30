@@ -11,7 +11,7 @@
 
 	let tryToConnect = function (url) {
 		// to reconnect, we are using javascript clouser to avoid the url parameter as global (global under this module)
-		// just try to make things more complex by using clouser. We could easily store url parameter in a variable and reuse it
+		// just try to make things more complex by using clouser. We could easily store url parameter in a variable (under a function scope) and reuse it
 
 		return function () {
 			socket = new WebSocket(url);
@@ -57,6 +57,7 @@
 				break;
 			case 'ActiveChannelUsers': CimpleChat.Channel.renderChannelUserList(response.Data);
 				break;
+			case 'ChannelList': CimpleChat.Channel.renderChannels(response.Data);
 		}
 	}
 

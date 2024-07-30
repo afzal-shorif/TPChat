@@ -20,7 +20,16 @@ public class MessageResponse
 
 public class MessageStatus
 {
+    public long ChannelId { get; set; }
     public long MessageId { get; set; }
     public long? TempMessageId { get; set; }
     public Models.MessageStatus Status { get; set; }
+}
+
+public class MessageHistoryRequest
+{
+    public long ChannelId { get; set; }
+    public long LastMessageId { get; set; }
+    public string RequestFor { get; set; }      // Latest: for new message, Old: for previous message
+
 }

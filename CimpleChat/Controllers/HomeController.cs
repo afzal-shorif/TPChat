@@ -42,7 +42,6 @@ namespace TPChat.Controllers
                 ViewBag.UserProfileCharacter = user.Name.Substring(0, 1).ToUpper();
             }
 
-            ViewBag.Channels = _channelService.GetChannelList();
             return View();
         }       
 

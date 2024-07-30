@@ -43,7 +43,7 @@ CimpleChat.Chat.MessageQueue = (function () {
 		*	return true if object is added to the queue and rendered to the UI
 		*	calling function should not clear the input field if return false
 		*/
-		enqueue: function (obj) {
+		enqueue: function (obj, isRenderable = true) {
 
 			if (messageQueue.length >= 10) {
 				return false;											//to inform that don't clear the input field
@@ -53,7 +53,9 @@ CimpleChat.Chat.MessageQueue = (function () {
 			messageQueue.push(obj);
 
 			// render the object into the UI
-			CimpleChat.Chat.UIRender.renderMessage(obj);
+			if (isRenderable) {
+				CimpleChat.Chat.UIRender.renderMessage(obj);
+			}
 
 			//try to send message
 			if (sendMessageInterval === null) {

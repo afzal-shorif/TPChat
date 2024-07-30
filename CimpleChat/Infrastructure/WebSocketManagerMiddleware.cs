@@ -50,18 +50,9 @@ namespace CimpleChat.Infrastructure
                 return;
             }
 
-            string sChannelId = context.Request.Query["channelId"].ToString();
-            Int32.TryParse(sChannelId, out int channelId);
-
-            if(channelId <= 0)
-            {
-                context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                return;
-            }
-
             var ws = await context.WebSockets.AcceptWebSocketAsync();
-            await _channelMessageHandler.OnConnectAsync(ws, channelId, user);
-            await _channelMessageHandler.ReceiveAsync(ws, channelId, user);
+            await _channelMessageHandler.OnConnectAsync(ws, user);
+            await _channelMessageHandler.ReceiveAsync(ws, user);
         }
     }
 }

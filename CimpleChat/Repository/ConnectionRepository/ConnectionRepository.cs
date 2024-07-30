@@ -1,4 +1,5 @@
 ﻿using CimpleChat.Models;
+using CimpleChat.Models.Chat;
 using System.Net.WebSockets;
 
 namespace CimpleChat.Repository.ConnectionRepository
@@ -7,7 +8,7 @@ namespace CimpleChat.Repository.ConnectionRepository
     {
         #region Fields
 
-        private IList<Connections> Connections { get; set; }
+        private IList<Connection> Connections { get; set; }
 
         #endregion
 
@@ -15,16 +16,26 @@ namespace CimpleChat.Repository.ConnectionRepository
 
         public ConnectionRepository()
         {
-            Connections = new List<Connections>();
+            Connections = new List<Connection>();
         }
 
         #endregion
 
         #region public Methods
 
+        public Connection? GetConnection(long userId)
+        {
+            return Connections.Where(c => c.UserId == userId).FirstOrDefault();
+        }
+
+        public IList<Connection> GetConnections(IList<long>users)
+        {
+            return Connections.Join(users, con => con.UserId, user => user, (con, user) => con).ToList();
+        }
+
         public void AddConnection(long userId, WebSocket ws)
         {
-            Connections.Add(new Models.Connections()
+            Connections.Add(new Models.Connection()
             {
                 UserId = userId,
                 connection = ws,
@@ -49,7 +60,7 @@ namespace CimpleChat.Repository.ConnectionRepository
             {
                 Connections.Remove(con);
             }
-        }
+        }       
 
         #endregion
     }

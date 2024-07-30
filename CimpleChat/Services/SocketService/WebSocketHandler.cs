@@ -11,11 +11,11 @@ namespace CimpleChat.Services.SocketService
 
         }
 
-        public abstract Task OnConnectAsync(WebSocket ws, int channelId, User user);
+        public abstract Task OnConnectAsync(WebSocket ws, User user);
 
-        public abstract Task OnDisconnectAsync(WebSocket ws, int channelId, User user);
+        public abstract Task OnDisconnectAsync(WebSocket ws, User user);
 
-        public abstract Task ReceiveAsync(WebSocket ws, int channelId, User user);
+        public abstract Task ReceiveAsync(WebSocket ws, User user);
 
 
         public async ValueTask SendMessageAsync(IList<WebSocket> connections, string message)

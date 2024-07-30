@@ -4,47 +4,6 @@
     let isGenderValid = false;
     let isAgeValid = false;
     let isUsernameAlreadyInUse = true;
-    let initRegistration = function (containerId) {
-        registrationModel = new bootstrap.Modal(containerId);
-
-        if (!isCookieAvailable('userInfo')) {
-            // show registration modal and attach event to the registration modal component (submit button, input fields)
-            registrationModel.show();
-
-            $(document).on('keyup', '#inputUsername', validateUsername);
-            //$(document).on('focusout', '#inputUsername', validateUsernameIsAlreadyInUse);
-            $(document).on('keyup', '#inputAge', validateAge);
-
-            $(document).on('click', containerId + " #registerUserBtn", function (e) {
-                e.preventDefault();
-
-                validateUsername();
-                validateGenger();
-                validateAge();
-
-                if (isUsernameValid && isGenderValid && isAgeValid) {
-                    validateUsernameIsAlreadyInUse();
-                }
-            });
-        }
-    }
-
-    let isCookieAvailable = function (cookeiName) {
-        let cookieList = document.cookie.split(';');
-        let flag = false;
-        $.each(cookieList, function (index) {
-            let cookeiPair = cookieList[index].trim().split('=');
-
-            if (cookeiPair[0] === cookeiName) {
-
-                if (typeof cookeiPair[1] != 'undefined' && cookeiPair[1] != '') {
-                    flag = true;
-                }
-            }
-        });
-
-        return flag;
-    }
 
     let registerUser = function () {
         let data = {
@@ -63,7 +22,12 @@
                     
                     let cookei = JSON.stringify(response.cookieInfo);
                     document.cookie = "userInfo=" + JSON.parse(cookei) + "; path=/";
-                    document.location = document.location;
+
+                    CimpleChat.Common.setConst('userId', response.userId);
+                    CimpleChat.Common.setConst('username', response.username);
+                    CimpleChat.Common.initApplication();
+
+                    registrationModel.hide();
                 } else {
 
                 }
@@ -144,7 +108,47 @@
     }
 
 	return {
-        initRegistration: initRegistration,
-        isCookieAvailable: isCookieAvailable
+        initRegistration: function (containerId) {
+            registrationModel = new bootstrap.Modal(containerId);
+
+            if (!this.isCookieAvailable('userInfo')) {
+                // show registration modal and attach event to the registration modal component (submit button, input fields)
+                registrationModel.show();
+
+                $(document).on('keyup', '#inputUsername', validateUsername);
+                //$(document).on('focusout', '#inputUsername', validateUsernameIsAlreadyInUse);
+                $(document).on('keyup', '#inputAge', validateAge);
+
+                $(document).on('click', containerId + " #registerUserBtn", function (e) {
+                    e.preventDefault();
+
+                    validateUsername();
+                    validateGenger();
+                    validateAge();
+
+                    if (isUsernameValid && isGenderValid && isAgeValid) {
+                        validateUsernameIsAlreadyInUse();
+                    }
+                });
+            } else {
+                CimpleChat.Common.initApplication();
+            }
+        },
+        isCookieAvailable: function (cookeiName) {
+            let cookieList = document.cookie.split(';');
+            let flag = false;
+            $.each(cookieList, function (index) {
+                let cookeiPair = cookieList[index].trim().split('=');
+
+                if (cookeiPair[0] === cookeiName) {
+
+                    if (typeof cookeiPair[1] != 'undefined' && cookeiPair[1] != '') {
+                        flag = true;
+                    }
+                }
+            });
+
+            return flag;
+        }
 	}
-})(document);
+})();

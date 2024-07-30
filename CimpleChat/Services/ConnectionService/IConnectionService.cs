@@ -1,13 +1,18 @@
-﻿using System.Net.WebSockets;
+﻿using CimpleChat.Models;
+using System.Net.WebSockets;
 
 namespace CimpleChat.Services.ConnectionService
 {
     public interface IConnectionService
     {
-        public void AddConnection(long userId, WebSocket ws);
+        Connection? GetConnection(long userId);
+        IList<Connection> GetConnections(long channelId);
+        IList<Connection> GetConnections(IList<long> users);
 
-        public void RemoveConnection(long userId);
+        void AddConnection(long userId, WebSocket ws);
 
-        public void RemoveConnection(WebSocket ws);
+        void RemoveConnection(long userId);
+
+        void RemoveConnection(WebSocket ws);
     }
 }

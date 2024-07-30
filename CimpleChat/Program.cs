@@ -17,9 +17,9 @@ builder.Services.AddDataProtection();
 builder.Services.AddSingleton<IGetNextId, GetNextId>();
 builder.Services.AddSingleton<IGroupMessageService, GroupMessageService>();
 builder.Services.AddSingleton<IUserService, UserService>();
-//builder.Services.AddSingleton<IConnectionService, ConnectionService>();
+builder.Services.AddSingleton<IConnectionService, ConnectionService>();
 
-//builder.Services.AddSingleton<IConnectionRepository, IConnectionRepository>();
+builder.Services.AddSingleton<IConnectionRepository, ConnectionRepository>();
 
 builder.Services.AddSingleton<ChannelMessageHandler>();
 builder.Services.AddHostedService<RefreshUserLastOn>();
@@ -29,9 +29,9 @@ builder.Services.AddHostedService<RefreshUserLastOn>();
 var app = builder.Build();
 
 app.UseWebSockets();
-app.Map("/Channel/Chat", (_app) => 
+app.Map("/WebSocket", (_app) => 
 { 
-    _app.UseMiddleware<WebSocketManagerMiddleware>(app.Services.GetRequiredService<ChannelMessageHandler>()); 
+    _app.UseMiddleware<WebSocketManagerMiddleware>(app.Services.GetRequiredService<ChannelMessageHandler>());
 });
 app.UseRouting();
 app.MapDefaultControllerRoute();

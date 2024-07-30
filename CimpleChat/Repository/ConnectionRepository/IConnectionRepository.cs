@@ -5,9 +5,12 @@ namespace CimpleChat.Repository.ConnectionRepository;
 
 public interface IConnectionRepository
 {
-    public void AddConnection(long userId, WebSocket ws);
+    Connection? GetConnection(long userId);
+    IList<Connection> GetConnections(IList<long> users);
 
-    public void RemoveConnection(long userId);
+    void AddConnection(long userId, WebSocket ws);
 
-    public void RemoveConnection(WebSocket ws);
+    void RemoveConnection(long userId);
+
+    void RemoveConnection(WebSocket ws);
 }

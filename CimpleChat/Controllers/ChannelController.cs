@@ -1,8 +1,9 @@
 ﻿using CimpleChat.Models;
+using CimpleChat.Models.Channel;
 using CimpleChat.Services.ChannelService;
-using CimpleChat.Services.SocketService;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.RegularExpressions;
 
 namespace CimpleChat.Controllers
 {
@@ -53,11 +54,97 @@ namespace CimpleChat.Controllers
             return View();
         }
 
-        public IActionResult GetChannelList()
+        public IActionResult Create(string channelName, int type)
         {
-            var channels = _channelService.GetChannelList();
+            string protectedCookie = _context!.Request.Cookies["userInfo"] ?? string.Empty;
             
-            return Json(channels);
+            if (!string.IsNullOrEmpty(protectedCookie))
+            {
+                string cookieValue = _protector.Unprotect(protectedCookie);
+                var user = System.Text.Json.JsonSerializer.Deserialize<User>(cookieValue);
+
+                if (user != null)
+                {
+                    string validateMsg = ValidateChannelName(channelName);
+
+                    if (string.IsNullOrEmpty(validateMsg) && (type == 0 || type == 1))
+                    {
+                        long channelId = _channelService.AddNewChannel(channelName, (type == 0) ? ChannelType.@private : ChannelType.@public);
+
+                        _channelService.AddUserToChannel(channelId, user.Id);
+
+                        return Json(new { ChannelId = channelId });
+                    }
+                    else
+                    {
+                        return Json(new { Error = validateMsg });
+                    }                  
+                }
+            }
+
+            return Json(new { Error = "Invalid user info." });
+        }
+
+        public void AddMemberToChannel(long channelId, long userId)
+        {
+            string protectedCookie = _context!.Request.Cookies["userInfo"] ?? string.Empty;
+
+            if (!string.IsNullOrEmpty(protectedCookie))
+            {
+                string cookieValue = _protector.Unprotect(protectedCookie);
+                var user = System.Text.Json.JsonSerializer.Deserialize<User>(cookieValue);
+
+                if (user != null)
+                {
+                    if(userId == user.Id)
+                    {
+                        _channelService.AddMemberToPublicChannel(channelId, user.Id);
+                    }
+                    else
+                    {
+                        _channelService.AddMemberToPrivateChannel(channelId, userId, user.Id);
+                    }
+                }
+            }
+        }
+
+        public IActionResult SearchChannels(string search)
+        {            
+            var channelList = _channelService.SearchChannel(search.Trim());
+
+            return Json(channelList);
+        }
+
+        private string ValidateChannelName(string channelName)
+        {
+            Regex regex = new Regex(@"^[a-zA-Z][a-zA-Z0-9]{2,17}$");
+
+            if (!string.IsNullOrEmpty(channelName) && !regex.IsMatch(channelName))
+            {
+                return "Invalid channel name.";
+            }
+            else if (channelName.Length <=2 )
+            {
+                return "Invalid channel name.";
+            }
+            else if(!IsChannelNameAvailable(channelName))
+            {
+                return "Channel name is already available.";
+            }
+
+            return "";
+        }
+
+        private bool IsChannelNameAvailable(string name)
+        {
+            // determine that is channel name is available to register.
+            // return false if a channel is already exist under same name.
+
+            if (_channelService.IsChannelNameExist(name))
+            {
+                return false;
+            }
+            return true;
         }
     }
 }
