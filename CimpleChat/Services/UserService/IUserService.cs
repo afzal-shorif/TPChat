@@ -10,5 +10,6 @@ namespace CimpleChat.Services.UserService
         public bool IsUsernameAvailable(string username);
         public void UpdateLastActiveOn(long userId);
         public void RemoveInactiveUsers();
+        IEnumerable<object> SearchUser(string username);
     }
 }

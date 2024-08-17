@@ -125,6 +125,7 @@
 			};
 			CimpleChat.Chat.UIRender.clear();
 			currentChannelId = channelId;
+			$('#addMemberBtn').show();
 			CimpleChat.Chat.MessageQueue.enqueue(requestObject);
 		},
 
@@ -158,10 +159,13 @@
 			});
 		},
 
-		addMemberToChannel: function (channelID) {
+		addMemberToChannel: function (channelID, userID) {
+			var cId = (channelID === '') ? currentChannelId : channelID,
+				uId = (userID === '') ? CimpleChat.Common.getConst('userId') : userID;
+
 			$.ajax({
 				url: Urls.addMemberToChannel,
-				data: { channelId: channelID, userId: CimpleChat.Common.getConst('userId') },
+				data: { channelId: cId, userId: uId },
 				type: 'GET',
 				success: function (response) {
 					sendRequestForUpdateChannelList();

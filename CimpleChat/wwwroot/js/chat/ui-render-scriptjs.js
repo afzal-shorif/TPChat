@@ -3,8 +3,12 @@
 
 	// render message
 	let renderMessageToUI = function (response) {
+		if (response.Data.length == 0) {
+			return;
+		}
+
 		var messageDomString = '',
-			opts = {fomr: ''};
+			opts = { fomr: '' };
 		if (Array.isArray(response.Data)) {
 			// if the Data is and array, load the previous message and return
 		
@@ -41,7 +45,7 @@
 
 		renderElementToMessageContainer(messageDomString, opts);
 
-		if (response.Type === "Message" && response.Data.UserId != CimpleChat.Common.getConst('userId')) {
+		if (response.Type === "Message" && response.Data.UserId !== CimpleChat.Common.getConst('userId')) {
 			sendMessageSeenResponse(response.Data.MessageId);
 		}
 	}
@@ -189,7 +193,9 @@
 			$(messageContainer).html('');
 		},
 		renderMessage: function (response) {
-			renderMessageToUI(response);
+			if (response.Type !== "MessageHistory") {
+				renderMessageToUI(response);
+			}
 		},
 		updateSeenFlag: function () {
 			var msgId = '';

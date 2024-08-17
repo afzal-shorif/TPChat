@@ -1,7 +1,6 @@
-﻿using CimpleChat.Models;
-using CimpleChat.Models.Chat;
-using CimpleChat.Models.Channel;
-using System.Net.WebSockets;
+﻿using CimpleChat.Models.Channel;
+using CimpleChat.Models;
+using CimpleChat.Models.MessageModel;
 
 namespace CimpleChat.Services.ChannelService
 {
@@ -11,7 +10,7 @@ namespace CimpleChat.Services.ChannelService
         public IList<ChannelInfo> GetChannelList(long userId);
         public IList<MessageResponse> GetMessages(long channelId);
         public Message GetMessage(long channelId, long messageId);
-        public void UpdateMessageStatus(long channelId, long messageId, Models.MessageStatus Status);
+        public void UpdateMessageStatus(long channelId, long messageId, MessageStatus Status);
         public IList<ActiveUserResponse> GetActiveUsers(long channelId);
         bool AddUserToChannel(long channelId, long userId);
         bool AddMemberToPublicChannel(long channelId, long userId);

@@ -10,7 +10,8 @@ CimpleChat.UI = (function(){
         msgInputField = '#msgInputField',
         cursorInterval = null,
         searchField = '#searchField',
-        suggestionContainer = '#searchSuggestionContainer';
+        suggestionContainer = '#searchSuggestionContainer',
+        addMemberModal = null;
 
     var channelListShowHideEvent = function(){
        // bind the event for the arrow icon of public and private channel list
@@ -54,7 +55,7 @@ CimpleChat.UI = (function(){
 
     var searchChannelResultEvent = function () {
         $(document).on('click', '#searchSuggestionContainer .list-group-item', function (e) {
-            CimpleChat.Channel.addMemberToChannel($(this).attr('data-id'));
+            CimpleChat.Channel.addMemberToChannel( $(this).attr('data-id'), '');
 
             $(suggestionContainer).hide();
             $(suggestionContainer).html('');
@@ -111,6 +112,58 @@ CimpleChat.UI = (function(){
             createPrivateChannel();
             createPublicChannel();
             createChannelButtonEvent();
+
+            $('#addMemberBtn').on('click', function () {
+                if (addMemberModal == null) {
+                    addMemberModal = new bootstrap.Modal(document.getElementById('addMemberModal'));
+                }
+
+                $('#addMemberSearchInput').val('');
+                addMemberModal.show();
+            });
+            
+            $('#addMemberSearchInput').on('keyup', function(){
+                var searchText = $(this).val();
+                
+                if(searchText.length > 2){
+                   $.ajax({
+				        url: Urls.searchUser,
+				        data: { name: searchText},
+				        type: 'GET',
+				        success: function (result) {
+                            var container = $('#addMemberSearchResultContainer');
+                            console.log(result);
+                            if (result.length > 0) {
+                                var resultDom = [];
+                                resultDom.push('<ul class="list-group list-group-flush">');
+
+                                $.each(result, function (i) {
+                                    resultDom.push('<li class="list-group-item d-flex justify-content-between align-items-start" data-id="' + result[i].id + '">');
+                                    resultDom.push(result[i].name);
+                                    resultDom.push('</li>');
+                                });
+
+                                resultDom.push('</ul>');
+
+                                container.html(resultDom.join(''));
+                                container.show();
+                            }
+				        },
+				        error: function (response) {
+
+				        }
+			        });
+                }
+            });
+
+            $(document).on('click', '#addMemberSearchResultContainer .list-group-item', function (e) {
+                var suggestionContainer = '#addMemberSearchResultContainer';
+
+                CimpleChat.Channel.addMemberToChannel('', $(this).attr('data-id'));
+
+                $(suggestionContainer).hide();
+                $(suggestionContainer).html('');
+            });
         }
     }
 })();

@@ -1,4 +1,6 @@
-﻿namespace CimpleChat.Models.Channel
+﻿using CimpleChat.Models.MessageModel;
+
+namespace CimpleChat.Models.Channel
 {
     public enum ChannelType
     {

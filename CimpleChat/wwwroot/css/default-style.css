@@ -128,3 +128,7 @@ html, body {
     border-bottom-left-radius: 0px !important;
     border-bottom-right-radius: 0px !important;
 }
+
+#addMemberSearchResultContainer .list-group-item {
+    cursor: pointer;
+}

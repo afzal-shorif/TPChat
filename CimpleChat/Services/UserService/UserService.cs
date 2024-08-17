@@ -58,5 +58,13 @@ namespace CimpleChat.Services.UserService
                 }
             }
         }
+
+        public IEnumerable<object> SearchUser(string username)
+        {
+            return Users.Where(u => u.Name.Contains(username)).Select(u => new {
+                ID = u.Id,
+                Name = u.Name,
+            });
+        }
     }
 }

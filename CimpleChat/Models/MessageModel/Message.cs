@@ -1,4 +1,4 @@
-﻿namespace CimpleChat.Models
+﻿namespace CimpleChat.Models.MessageModel
 {
     public enum MessageStatus
     {

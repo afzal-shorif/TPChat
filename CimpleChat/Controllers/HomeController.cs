@@ -43,7 +43,26 @@ namespace TPChat.Controllers
             }
 
             return View();
-        }       
+        }
+
+        public IActionResult SearchUser(string name)
+        {
+            string? protectedCookie = _context.Request.Cookies["userInfo"];
+
+            if (!string.IsNullOrEmpty(protectedCookie))
+            {
+                string cookieValue = _protector.Unprotect(protectedCookie);
+                var user = System.Text.Json.JsonSerializer.Deserialize<User>(cookieValue);
+
+                if(user != null && !string.IsNullOrEmpty(name) && name.Length > 2)
+                {
+                    var userList = _userService.SearchUser(name);
+                    return Json(userList);
+                }
+            }
+
+            return Json(new { Error = "Invalid request"});
+        }
 
         public void UpdateActiveStatus()
         {

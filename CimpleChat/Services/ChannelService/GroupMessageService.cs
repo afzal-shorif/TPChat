@@ -1,8 +1,7 @@
 ﻿using CimpleChat.Models;
-using CimpleChat.Models.Chat;
+using CimpleChat.Models.MessageModel;
 using CimpleChat.Models.Channel;
 using CimpleChat.Services.UserService;
-using System.Net.WebSockets;
 
 namespace CimpleChat.Services.ChannelService
 {
@@ -99,11 +98,12 @@ namespace CimpleChat.Services.ChannelService
 
         public IList<MessageResponse> GetMessages(long channelId)
         {
-            var messages = Channels[channelId].Messages.OrderByDescending(m => m.Id).Take(10);
+            var messages = Channels[channelId].Messages.OrderBy(m => m.Id).Take(10);
             var users = _userService.GetUsers();
 
             var result = messages.Join(users, msg => msg.From, user => user.Id, (msg, user) => new MessageResponse()
             {
+                ChannelId = channelId,
                 MessageId = msg.Id,
                 UserId = user.Id,
                 UserName = user.Name,
@@ -126,7 +126,7 @@ namespace CimpleChat.Services.ChannelService
             return null;
         }
 
-        public void UpdateMessageStatus(long channelId, long messageId, Models.MessageStatus Status)
+        public void UpdateMessageStatus(long channelId, long messageId, MessageStatus Status)
         {
             var message = Channels[channelId].Messages.Where(m => m.Id == messageId);
             if (message.Any())
@@ -177,7 +177,8 @@ namespace CimpleChat.Services.ChannelService
             {
                 if(Channels[channelId].Type == ChannelType.@public)
                 {
-                    return false;
+                    Channels[channelId].Users.Add(userId);
+                    return true;
                 }
 
                 if (!Channels[channelId].Users.Contains(requestedUserId) || Channels[channelId].Users.Contains(userId))
@@ -255,7 +256,7 @@ namespace CimpleChat.Services.ChannelService
                 Id = _getNextId.GetMessageId(),
                 From = messageRequest.UserId,
                 Content = messageRequest.Content,
-                Status = Models.MessageStatus.Saved,
+                Status = MessageStatus.Saved,
                 CreatedAt = DateTime.Now,
             };
 
@@ -283,7 +284,7 @@ namespace CimpleChat.Services.ChannelService
                 Id = _getNextId.GetMessageId(),
                 From = 0,
                 Content = type == "leave" ? $"{user.Name} has leave." : $"{user.Name} has join.",
-                Status = Models.MessageStatus.Saved,
+                Status = MessageStatus.Saved,
                 CreatedAt = DateTime.Now,
             };
 
